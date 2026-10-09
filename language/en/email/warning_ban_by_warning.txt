@@ -1,0 +1,18 @@
+Subject: {SITENAME} - Your account has been banned automatically
+
+Hello {USERNAME},
+
+Your account on "{SITENAME}" has been banned automatically for reaching the limit of {WARNINGS_COUNT} active warnings.
+
+The last warning that triggered this ban was:
+----------------------------------------------------------------------
+Infringed Rule: {RULE_TYPE}
+Details: {RULE_DESCRIPTION}
+
+Justification: {RULE}
+Duration: {WARNING_LENGTH}
+----------------------------------------------------------------------
+
+This is an automatic system ban.
+
+{EMAIL_SIG}

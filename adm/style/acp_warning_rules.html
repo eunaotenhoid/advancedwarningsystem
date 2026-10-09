@@ -1,0 +1,136 @@
+<!-- INCLUDE overall_header.html -->
+
+<a id="maincontent"></a>
+
+<h1>{L_ACP_WARN_RULES}</h1>
+
+<p>{L_ACP_WARN_RULES_EXPLAIN}</p>
+
+<!-- IF S_EDIT -->
+<form id="acp_rules" method="post" action="{U_ACTION}">
+	<fieldset>
+		<legend>{L_EDIT_RULE}</legend>
+		<dl>
+			<dt><label for="rule_title">{L_RULE_TITLE}{L_COLON}</label></dt>
+			<dd><input type="text" id="rule_title" name="rule_title" value="{RULE_TITLE}" maxlength="255"
+					size="40" /></dd>
+		</dl>
+		<dl>
+			<dt><label for="rule_description">{L_RULE_DESCRIPTION}{L_COLON}</label></dt>
+			<dd><textarea id="rule_description" name="rule_description" rows="5"
+					cols="45">{RULE_DESCRIPTION}</textarea></dd>
+		</dl>
+		<dl>
+			<dt><label for="rule_points">{L_RULE_POINTS}{L_COLON}</label></dt>
+			<dd><input type="number" id="rule_points" name="rule_points" value="{RULE_POINTS}" min="0" size="5" />
+			</dd>
+		</dl>
+		<dl>
+			<dt><label
+					for="rule_duration">{L_RULE_DURATION}{L_COLON}</label><br /><span>{L_RULE_DURATION_ZERO_EXPLAIN}</span>
+			</dt>
+			<dd><input type="number" id="rule_duration" name="rule_duration" value="{RULE_DURATION}" min="0"
+					size="5" /> {L_DAYS}</dd>
+		</dl>
+		<dl>
+			<dt><label
+					for="rule_is_warning">{L_INF_WARNING_ONLY}{L_COLON}</label><br /><span>{L_INF_WARNING_ONLY_EXPLAIN}</span>
+			</dt>
+			<dd>
+				<label><input type="radio" class="radio" name="rule_is_warning" value="1"<!-- IF RULE_IS_WARNING --> checked="checked"<!-- ENDIF --> /> {L_YES}</label>
+				<label><input type="radio" class="radio" name="rule_is_warning" value="0"<!-- IF not RULE_IS_WARNING --> checked="checked"<!-- ENDIF --> /> {L_NO}</label>
+			</dd>
+		</dl>
+		<!-- IF S_APPEALS_ENABLED -->
+		<dl>
+			<dt><label
+					for="rule_allow_appeal">{L_RULE_ALLOW_APPEAL}{L_COLON}</label><br /><span>{L_RULE_ALLOW_APPEAL_EXPLAIN}</span>
+			</dt>
+			<dd>
+				<label><input type="radio" class="radio" name="rule_allow_appeal" value="1"<!-- IF RULE_ALLOW_APPEAL --> checked="checked"<!-- ENDIF --> /> {L_YES}</label>
+				<label><input type="radio" class="radio" name="rule_allow_appeal" value="0"<!-- IF not RULE_ALLOW_APPEAL --> checked="checked"<!-- ENDIF --> /> {L_NO}</label>
+			</dd>
+		</dl>
+		<dl>
+			<dt><label for="rule_appeal_convert_to">{L_RULE_CONVERT_TO}{L_COLON}</label><br /><span>{L_RULE_CONVERT_TO_EXPLAIN}</span></dt>
+			<dd>
+				<select name="rule_appeal_convert_to" id="rule_appeal_convert_to">
+					<option value="">{L_RULE_CONVERT_NONE}</option>
+					<!-- BEGIN convert_rules -->
+					<option value="{convert_rules.TITLE}"<!-- IF convert_rules.SELECTED --> selected="selected"<!-- ENDIF -->>{convert_rules.TITLE}</option>
+					<!-- END convert_rules -->
+				</select>
+			</dd>
+		</dl>
+		<!-- ENDIF -->
+		<dl>
+			<dt><label
+					for="rule_is_locked">{L_INF_MOD_LOCKED}{L_COLON}</label><br /><span>{L_INF_MOD_LOCKED_EXPLAIN}</span>
+			</dt>
+			<dd>
+				<label><input type="radio" class="radio" name="rule_is_locked" value="1"<!-- IF RULE_IS_LOCKED --> checked="checked"<!-- ENDIF --> /> {L_YES}</label>
+				<label><input type="radio" class="radio" name="rule_is_locked" value="0"<!-- IF not RULE_IS_LOCKED --> checked="checked"<!-- ENDIF --> /> {L_NO}</label>
+			</dd>
+		</dl>
+
+		<p class="submit-buttons">
+			<input class="button1" type="submit" id="submit" name="submit" value="{L_SUBMIT}" />&nbsp;
+			<input class="button2" type="reset" id="reset" name="reset" value="{L_RESET}" />
+		</p>
+		<p class="quick">
+			<a href="{U_BACK}">&laquo; {L_BACK}</a>
+		</p>
+		{S_FORM_TOKEN}
+	</fieldset>
+</form>
+<!-- ELSE -->
+<form id="acp_rules" method="post" action="{U_ACTION}">
+	<fieldset class="tabulated">
+		<legend>{L_ACP_WARN_RULES}</legend>
+		<table class="table1">
+			<thead>
+				<tr>
+					<th>{L_RULE_TITLE}</th>
+					<th>{L_RULE_POINTS}</th>
+					<th>{L_RULE_DURATION}</th>
+					<th style="width: 120px;">{L_ACTION}</th>
+				</tr>
+			</thead>
+			<tbody>
+				<!-- BEGIN rules -->
+				<tr id="rule_{rules.ID}">
+					<td>{rules.TITLE}</td>
+					<td style="text-align: center;">{rules.POINTS}</td>
+					<td style="text-align: center;"><!-- IF rules.DURATION -->{rules.DURATION}
+						{L_DAYS}<!-- ELSE -->{L_PERMANENT}<!-- ENDIF --></td>
+					<td class="actions" style="text-align: center; white-space: nowrap;">
+						<span class="up-disabled" style="display:none;">{ICON_MOVE_UP_DISABLED}</span>
+						<span class="up"><a href="{{ rules.U_MOVE_UP }}" data-ajax="row_up">{ICON_MOVE_UP}</a></span>
+
+						<span class="down-disabled" style="display:none;">{ICON_MOVE_DOWN_DISABLED}</span>
+						<span class="down"><a href="{{ rules.U_MOVE_DOWN }}"
+								data-ajax="row_down">{ICON_MOVE_DOWN}</a></span>
+						&nbsp;
+						<a href="{{ rules.U_EDIT }}" title="{{ lang('EDIT') }}">{ICON_EDIT}</a> &nbsp;
+						<a href="{{ rules.U_DELETE }}" title="{{ lang('DELETE') }}"
+							data-ajax="row_delete">{ICON_DELETE}</a>
+					</td>
+				</tr>
+				<!-- BEGINELSE -->
+				<tr>
+					<td colspan="4">{L_NO_ENTRIES}</td>
+				</tr>
+				<!-- END rules -->
+			</tbody>
+		</table>
+
+		<p class="quick">
+			<a href="{U_ADD}" class="button2">{L_ADD_RULE}</a>
+			<a href="{U_BACK}" class="button2">{L_BACK}</a>
+		</p>
+	</fieldset>
+	{S_FORM_TOKEN}
+</form>
+<!-- ENDIF -->
+
+<!-- INCLUDE overall_footer.html -->

@@ -1,0 +1,19 @@
+Subject: {SITENAME} - Your account has been banned for a post
+
+Hello {USERNAME},
+
+Your account on "{SITENAME}" has been banned by {WARNING_POSTER} due to the following post: {POST_URL}
+
+----------------------------------------------------------------------
+Infringed Rule: {RULE_TYPE}
+Details: {RULE_DESCRIPTION}
+
+Justification: {RULE}
+Ban Duration: {WARNING_LENGTH}
+----------------------------------------------------------------------
+
+This is an immediate ban issued by a moderator.
+
+If you have any questions about this ban, please contact {WARNING_POSTER}.
+
+{EMAIL_SIG}

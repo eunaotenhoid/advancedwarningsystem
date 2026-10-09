@@ -1,0 +1,38 @@
+<div class="panel">
+	<div class="inner">
+
+	<h3>{L_LATEST_WARNINGS}</h3>
+
+	<!-- IF .mcp_latest_warnings -->
+		<ul class="topiclist two-columns">
+			<li class="header">
+				<dl>
+					<dt><div class="list-inner">{L_VIEW_DETAILS}</div></dt>
+					<dd class="moderation"><span>{L_DATE}</span></dd>
+				</dl>
+			</li>
+		</ul>
+		<ul class="topiclist cplist two-columns">
+
+		<!-- BEGIN mcp_latest_warnings -->
+		<li class="row<!-- IF mcp_latest_warnings.S_ROW_COUNT is odd --> bg1<!-- ELSE --> bg2<!-- ENDIF -->">
+			<dl>
+				<dt>
+					<div class="list-inner">
+						{mcp_latest_warnings.U_USER} &raquo; {mcp_latest_warnings.WARNING_TYPE}
+						<div class="responsive-show" style="display: none;">
+							{L_DATE}{L_COLON} <strong>{mcp_latest_warnings.DATE}</strong>
+						</div>
+					</div>
+				</dt>
+				<dd class="moderation"><span>{mcp_latest_warnings.DATE}</span></dd>
+			</dl>
+		</li>
+		<!-- END mcp_latest_warnings -->
+		</ul>
+	<!-- ELSE -->
+		<p><strong>{L_NO_WARNINGS}</strong></p>
+	<!-- ENDIF -->
+
+	</div>
+</div>

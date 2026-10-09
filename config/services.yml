@@ -1,0 +1,208 @@
+imports:
+    - { resource: tables.yml }
+
+services:
+    eunaumtenhoid.advancedwarningsystem.notification.type.appeal_result:
+        class: eunaumtenhoid\advancedwarningsystem\notification\type\appeal_result
+        shared: false
+        parent: notification.type.base
+        tags: [ { name: notification.type } ]
+        calls:
+            - [ 'set_config', [ '@config' ] ]
+
+    eunaumtenhoid.advancedwarningsystem.listener:
+        class: eunaumtenhoid\advancedwarningsystem\event\listener
+        arguments:
+            - '@config'
+            - '@dbal.conn'
+            - '@auth'
+            - '@template'
+            - '@user'
+            - '@request'
+            - '%core.root_path%'
+            - '%core.php_ext%'
+            - '%core.table_prefix%'
+            - '@ext.manager'
+        tags:
+            - { name: event.listener }
+
+    eunaumtenhoid.advancedwarningsystem.acp_listener:
+        class: eunaumtenhoid\advancedwarningsystem\event\acp_listener
+        arguments:
+            - '@config'
+            - '@dbal.conn'
+            - '@dbal.tools'
+            - '@template'
+            - '@user'
+            - '@request'
+            - '%core.root_path%'
+            - '%core.php_ext%'
+            - '%core.table_prefix%'
+            - '@ext.manager'
+            - '%eunaumtenhoid.advancedwarningsystem.tables.warning_rules%'
+        tags:
+            - { name: event.listener }
+
+    eunaumtenhoid.advancedwarningsystem.cron.task.aws_tidy_warnings:
+        class: eunaumtenhoid\advancedwarningsystem\cron\task\aws_tidy_warnings
+        arguments:
+            - '@config'
+            - '@dbal.conn'
+            - '@user'
+            - '@cache.driver'
+            - '@log'
+        calls:
+            - [set_name, [cron.task.core.aws_tidy_warnings]]
+        tags:
+            - { name: cron.task }
+
+    eunaumtenhoid.advancedwarningsystem.acp.main_module:
+        class: eunaumtenhoid\advancedwarningsystem\acp\main_module
+        arguments:
+            - '@config'
+            - '@dbal.conn'
+            - '@dbal.tools'
+            - '@template'
+            - '@user'
+            - '@request'
+            - '@cache.driver'
+            - '%core.table_prefix%'
+            - '%eunaumtenhoid.advancedwarningsystem.tables.warning_rules%'
+
+    eunaumtenhoid.advancedwarningsystem.mcp.main_module:
+        class: eunaumtenhoid\advancedwarningsystem\mcp\main_module
+        arguments:
+            - '@config'
+            - '@dbal.conn'
+            - '@auth'
+            - '@template'
+            - '@user'
+            - '@request'
+            - '@log'
+            - '@cache.driver'
+            - '@service_container'
+            - '%core.root_path%'
+            - '%core.php_ext%'
+            - '%core.table_prefix%'
+
+    eunaumtenhoid.advancedwarningsystem.ucp.main_module:
+        class: eunaumtenhoid\advancedwarningsystem\ucp\main_module
+
+    # MCP AWS Controllers
+    eunaumtenhoid.advancedwarningsystem.controller.mcp_aws_front:
+        class: eunaumtenhoid\advancedwarningsystem\controller\mcp\mcp_aws_front
+        arguments:
+            - '@config'
+            - '@dbal.conn'
+            - '@dbal.tools'
+            - '@auth'
+            - '@template'
+            - '@user'
+            - '@request'
+            - '@log'
+            - '@cache.driver'
+            - '@service_container'
+            - '%core.root_path%'
+            - '%core.php_ext%'
+            - '%core.table_prefix%'
+            - '%eunaumtenhoid.advancedwarningsystem.tables.warning_rules%'
+
+    eunaumtenhoid.advancedwarningsystem.controller.mcp_aws_list:
+        class: eunaumtenhoid\advancedwarningsystem\controller\mcp\mcp_aws_list
+        arguments:
+            - '@config'
+            - '@dbal.conn'
+            - '@dbal.tools'
+            - '@auth'
+            - '@template'
+            - '@user'
+            - '@request'
+            - '@log'
+            - '@cache.driver'
+            - '@service_container'
+            - '%core.root_path%'
+            - '%core.php_ext%'
+            - '%core.table_prefix%'
+            - '%eunaumtenhoid.advancedwarningsystem.tables.warning_rules%'
+
+    eunaumtenhoid.advancedwarningsystem.controller.mcp_aws_warn_post:
+        class: eunaumtenhoid\advancedwarningsystem\controller\mcp\mcp_aws_warn_post
+        arguments:
+            - '@config'
+            - '@dbal.conn'
+            - '@dbal.tools'
+            - '@auth'
+            - '@template'
+            - '@user'
+            - '@request'
+            - '@log'
+            - '@cache.driver'
+            - '@service_container'
+            - '%core.root_path%'
+            - '%core.php_ext%'
+            - '%core.table_prefix%'
+            - '%eunaumtenhoid.advancedwarningsystem.tables.warning_rules%'
+
+    eunaumtenhoid.advancedwarningsystem.controller.mcp_aws_warn_user:
+        class: eunaumtenhoid\advancedwarningsystem\controller\mcp\mcp_aws_warn_user
+        arguments:
+            - '@config'
+            - '@dbal.conn'
+            - '@dbal.tools'
+            - '@auth'
+            - '@template'
+            - '@user'
+            - '@request'
+            - '@log'
+            - '@cache.driver'
+            - '@service_container'
+            - '%core.root_path%'
+            - '%core.php_ext%'
+            - '%core.table_prefix%'
+            - '%eunaumtenhoid.advancedwarningsystem.tables.warning_rules%'
+
+    eunaumtenhoid.advancedwarningsystem.controller.mcp_aws_appeals:
+        class: eunaumtenhoid\advancedwarningsystem\controller\mcp\mcp_aws_appeals
+        arguments:
+            - '@config'
+            - '@dbal.conn'
+            - '@dbal.tools'
+            - '@auth'
+            - '@template'
+            - '@user'
+            - '@request'
+            - '@log'
+            - '@cache.driver'
+            - '@service_container'
+            - '%core.root_path%'
+            - '%core.php_ext%'
+            - '%core.table_prefix%'
+            - '%eunaumtenhoid.advancedwarningsystem.tables.warning_rules%'
+
+    # UCP AWS Controllers
+    eunaumtenhoid.advancedwarningsystem.controller.ucp_aws_warning_list:
+        class: eunaumtenhoid\advancedwarningsystem\controller\ucp\ucp_aws_warning_list
+        arguments:
+            - '@config'
+            - '@dbal.conn'
+            - '@dbal.tools'
+            - '@template'
+            - '@user'
+            - '%core.root_path%'
+            - '%core.php_ext%'
+            - '%core.table_prefix%'
+            - '%eunaumtenhoid.advancedwarningsystem.tables.warning_rules%'
+
+    eunaumtenhoid.advancedwarningsystem.controller.ucp_aws_appeal:
+        class: eunaumtenhoid\advancedwarningsystem\controller\ucp\ucp_aws_appeal
+        arguments:
+            - '@config'
+            - '@dbal.conn'
+            - '@dbal.tools'
+            - '@template'
+            - '@user'
+            - '@request'
+            - '%core.root_path%'
+            - '%core.php_ext%'
+            - '%core.table_prefix%'
+            - '%eunaumtenhoid.advancedwarningsystem.tables.warning_rules%'

@@ -1,0 +1,18 @@
+Subject: {SITENAME} - Sua conta foi banida automaticamente
+
+Olá {USERNAME},
+
+Sua conta em "{SITENAME}" foi banida automaticamente por atingir o limite de {WARNINGS_COUNT} advertências ativas.
+
+A última advertência que causou este banimento foi:
+----------------------------------------------------------------------
+Regra Infringida: {RULE_TYPE}
+Detalhes: {RULE_DESCRIPTION}
+
+Justificativa: {RULE}
+Duração: {WARNING_LENGTH}
+----------------------------------------------------------------------
+
+Este é um banimento automático do sistema.
+
+{EMAIL_SIG}

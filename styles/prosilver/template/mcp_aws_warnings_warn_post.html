@@ -1,0 +1,261 @@
+<!-- INCLUDE mcp_header.html -->
+
+<form method="post" id="mcp" action="{U_POST_ACTION}" onsubmit="return validate_warning_form();">
+
+<h2>{L_MCP_WARN_POST}</h2>
+
+<div class="panel">
+	<div class="inner">
+
+	<h3><!-- IF USER_COLOR --><span style="color: #{USER_COLOR}">{USERNAME}</span><!-- ELSE -->{USERNAME}<!-- ENDIF --></h3>
+
+	<div>
+		<div class="column1">
+			<!-- IF AVATAR_IMG --><div>{AVATAR_IMG}</div><!-- ENDIF -->
+		</div>
+
+		<div class="column2">
+			<dl class="details">
+				<!-- IF RANK_TITLE --><dt>{L_RANK}{L_COLON}</dt><dd>{RANK_TITLE}</dd><!-- ENDIF -->
+				<!-- IF RANK_IMG --><dt><!-- IF RANK_TITLE -->&nbsp;<!-- ELSE -->{L_RANK}{L_COLON}<!-- ENDIF --></dt><dd>{RANK_IMG}</dd><!-- ENDIF -->
+				<dt>{L_JOINED}{L_COLON}</dt><dd>{JOINED}</dd>
+				<dt>{L_TOTAL_POSTS}{L_COLON}</dt><dd>{POSTS}</dd>
+				<dt>{L_WARNINGS}{L_COLON} </dt><dd>{WARNINGS}</dd>
+			</dl>
+		</div>
+	</div>
+
+	</div>
+</div>
+
+<div class="panel">
+	<div class="inner">
+
+	<h3>{L_POST_DETAILS}</h3>
+
+	<div class="postbody">
+
+		<div class="content">
+			{POST}
+		</div>
+
+	</div>
+
+	</div>
+</div>
+
+<div class="panel">
+	<div class="inner">
+
+	<h3>{L_ADD_WARNING}</h3>
+	<p>{L_ADD_WARNING_EXPLAIN}</p>
+
+	<fieldset>
+		<dl>
+			<dt><label for="predefined_rule">{L_WARNING_TYPE}{L_COLON}</label></dt>
+			<dd>
+				<select name="predefined_rule" id="predefined_rule" onchange="update_warning_form(this);">
+					<option value="0">-- {L_SELECT_RULE} --</option>
+					<!-- IF S_ALLOW_CUSTOM -->
+					<option value="-1" data-duration="0" data-title="" data-description="" data-points="1" data-is-warning="0" data-is-locked="0">-- {L_CUSTOM_RULE} --</option>
+					<!-- ENDIF -->
+					<!-- BEGIN rules -->
+						<option value="{rules.ID}" data-duration="{rules.DURATION}" data-title="{rules.TITLE}" data-description="{rules.DESCRIPTION}" data-points="{rules.POINTS}" data-is-warning="{rules.IS_WARNING}" data-is-locked="{rules.IS_LOCKED}">{rules.TITLE}</option>
+					<!-- END rules -->
+				</select>
+				<!-- Hidden original warn type (Warning/Ban) -->
+				<select name="warntype" id="warntype" style="display:none;">{S_WARN_TYPE_OPTIONS}</select>
+			</dd>
+		</dl>
+		<dl>
+			<dt><label for="rule_points">{L_RULE_POINTS}{L_COLON}</label></dt>
+			<dd><input type="number" name="rule_points" id="rule_points" value="<!-- IF WARNING_POINTS -->{WARNING_POINTS}<!-- ELSE -->1<!-- ENDIF -->" min="0" class="inputbox autowidth" /></dd>
+		</dl>
+		<dl>
+			<dt><label for="warn_duration">{L_WARNING_EXPIRES}{L_COLON}</label></dt>
+			<dd>
+				<input type="number" name="warn_duration" id="warn_duration" value="0" min="0" class="inputbox autowidth" onchange="update_permanent_checkbox();" /> {L_DAYS}
+				<label for="warn_never_expire" style="margin-left: 10px;">
+					<input type="checkbox" name="warn_never_expire" id="warn_never_expire" onclick="toggle_duration_input();" /> {L_NEVER_EXPIRE}
+				</label>
+				<!-- Hidden original warn length inputs for compatibility -->
+				<div style="display:none;">
+					<select name="warnlength" id="warnlength"><option value="-1" selected="selected"></option></select>
+					<input type="text" name="warnlengthother" id="warnlengthother" value="{WARNING_END}" />
+				</div>
+			</dd>
+		</dl>
+		<dl>
+			<dt><label for="warning">{L_WARNING}{L_COLON}</label></dt>
+			<dd><textarea name="warning" id="warning" class="inputbox" cols="40" rows="3"><!-- IF WARNING -->{WARNING}<!-- ELSE -->{L_WARNING_POST_DEFAULT}<!-- ENDIF --></textarea></dd>
+		</dl>
+
+		<script>
+		function validate_warning_form() {
+			var ruleSelect = document.getElementById('predefined_rule');
+			if (ruleSelect) {
+				if (ruleSelect.value == '0' || ruleSelect.value == '') {
+					alert('{LA_NO_RULE_SELECTED}');
+					ruleSelect.focus();
+					return false;
+				}
+				if (ruleSelect.value == '-1') {
+					var warningText = document.getElementById('warning');
+					if (warningText && warningText.value.trim() == '') {
+						alert('{LA_NO_WARNING}');
+						warningText.focus();
+						return false;
+					}
+				}
+			}
+			return true;
+		}
+
+		function update_warning_form(select) {
+			var option = select.options[select.selectedIndex];
+			if (option.value == 0) {
+				unlock_form();
+				return;
+			}
+			
+			// Fill rule description
+			document.getElementById('warning').value = option.getAttribute('data-description');
+			
+			// Fill points
+			var points = option.getAttribute('data-points');
+			var pointsInput = document.getElementById('rule_points');
+			var isWarning = option.getAttribute('data-is-warning');
+			
+			if (isWarning == 1) {
+				pointsInput.value = 0;
+			} else {
+				pointsInput.value = points;
+			}
+
+			// Fill duration
+			var duration = option.getAttribute('data-duration');
+			var durationInput = document.getElementById('warn_duration');
+			var neverExpire = document.getElementById('warn_never_expire');
+			
+			if (duration == 0) {
+				neverExpire.checked = true;
+				durationInput.value = 0;
+			} else {
+				neverExpire.checked = false;
+				durationInput.value = duration;
+			}
+			
+			// Handle locking
+			var isLocked = option.getAttribute('data-is-locked');
+			if (isLocked == 1) {
+				lock_form(isWarning == 1);
+			} else {
+				unlock_form();
+			}
+
+			toggle_duration_input();
+			update_warn_end_hidden();
+		}
+
+		function lock_form(lockPoints) {
+			document.getElementById('warn_duration').disabled = true;
+			document.getElementById('warn_never_expire').disabled = true;
+			document.getElementById('rule_points').readOnly = true;
+			if (lockPoints) {
+				document.getElementById('rule_points').disabled = true;
+			}
+		}
+
+		function unlock_form() {
+			document.getElementById('warning').readOnly = false;
+			document.getElementById('warn_duration').disabled = false;
+			document.getElementById('warn_never_expire').disabled = false;
+			document.getElementById('rule_points').readOnly = false;
+			document.getElementById('rule_points').disabled = false;
+			toggle_duration_input();
+		}
+
+		function toggle_duration_input() {
+			var durationInput = document.getElementById('warn_duration');
+			var neverExpire = document.getElementById('warn_never_expire');
+			
+			if (neverExpire.checked) {
+				durationInput.disabled = true;
+				durationInput.value = 0;
+			} else {
+				durationInput.disabled = false;
+			}
+			update_warn_end_hidden();
+		}
+
+		function update_permanent_checkbox() {
+			var durationInput = document.getElementById('warn_duration');
+			var neverExpire = document.getElementById('warn_never_expire');
+			
+			if (durationInput.value == 0) {
+				neverExpire.checked = true;
+				durationInput.disabled = true;
+			}
+			update_warn_end_hidden();
+		}
+
+		function update_warn_end_hidden() {
+			var durationInput = document.getElementById('warn_duration');
+			var neverExpire = document.getElementById('warn_never_expire');
+			var hiddenInput = document.getElementById('warnlengthother');
+			var lengthSelect = document.getElementById('warnlength');
+			
+			if (neverExpire.checked) {
+				hiddenInput.value = '';
+				lengthSelect.value = 0;
+				return;
+			}
+			
+			var duration = parseInt(durationInput.value);
+			if (duration > 0) {
+				lengthSelect.value = -1;
+				var d = new Date();
+				d.setDate(d.getDate() + duration);
+				var dateStr = d.getFullYear() + '-' + ('0' + (d.getMonth()+1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
+				hiddenInput.value = dateStr;
+			} else {
+				lengthSelect.value = 0;
+				hiddenInput.value = '';
+			}
+		}
+		</script>
+
+		<!-- IF S_CAN_NOTIFY -->
+		<hr />
+		<dl>
+			<dt><label>{L_NOTIFY_USER_WARN}{L_COLON}</label></dt>
+			<dd><label><input type="checkbox" name="notify_user" checked="checked" /> {L_YES}</label></dd>
+		</dl>
+		<!-- IF S_SHOW_SEND_AS_ME -->
+		<dl>
+			<dt><label for="send_as_me">{L_SEND_AS_ME}{L_COLON}</label></dt>
+			<dd><label><input type="checkbox" name="send_as_me" id="send_as_me" /> {L_YES}</label> <br /><span>{L_SEND_AS_ME_EXPLAIN}</span></dd>
+		</dl>
+		<!-- ENDIF -->
+		<!-- ENDIF -->
+		
+		<!-- IF S_HIDE_MOD_CHOICE -->
+		<dl>
+			<dt><label for="hide_moderator">{L_HIDE_MODERATOR}{L_COLON}</label></dt>
+			<dd><label><input type="checkbox" name="hide_moderator" id="hide_moderator" /> {L_YES}</label> <br /><span>{L_HIDE_MODERATOR_EXPLAIN}</span></dd>
+		</dl>
+		<!-- ENDIF -->
+	</fieldset>
+
+	</div>
+</div>
+
+<fieldset class="submit-buttons">
+	<input type="reset" value="{L_RESET}" name="reset" class="button2" />&nbsp; 
+	<input type="submit" name="action[add_warning]" value="{L_SUBMIT}" class="button1" />
+	<!-- IF WARNING_ID --><input type="hidden" name="warn_id" value="{WARNING_ID}" /><!-- ENDIF -->
+	{S_FORM_TOKEN}
+</fieldset>
+</form>
+
+<!-- INCLUDE mcp_footer.html -->

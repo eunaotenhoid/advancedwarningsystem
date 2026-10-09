@@ -1,0 +1,111 @@
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+
+/**
+ * RLSModal Core - Media Hub
+ * Preparado para Temas (Zeina, Flatboots, Prosilver) e Modo Noturno
+ */
+const RLSModal = {
+    // Cores padrão do SweetAlert2 (Purista)
+    colors: {
+        confirm: '#fc0307',
+        cancel: '#aaa',
+        danger: '#d33',
+        success: '#28a745',
+        info: '#3fc3ee'
+    },
+
+    /**
+     * Função Principal: Abre o modal com ganchos para CSS customizado
+     */
+    fire: function(options) {
+        return Swal.fire({
+            // --- Conteúdo ---
+            title: options.title || '{{ lang("INFORMATION")|escape("js") }}',
+            text: options.text || '',
+            html: options.html || '', 
+            icon: options.icon || 'info',
+            footer: options.footer || '',
+
+            // --- Botões e Idioma ---
+            showConfirmButton: options.showConfirm !== undefined ? options.showConfirm : true,
+            showCancelButton: options.showCancel || false,
+            confirmButtonText: options.confirmText || '{{ lang("OK")|escape("js") }}',
+            cancelButtonText: options.cancelText || '{{ lang("CANCEL")|escape("js") }}',
+            confirmButtonColor: options.confirmColor || this.colors.confirm,
+            cancelButtonColor: options.cancelColor || this.colors.cancel,
+            reverseButtons: options.reverse || false,
+
+            // --- Comportamento ---
+            timer: options.timer || null,
+            timerProgressBar: options.timerProgressBar || false,
+            allowOutsideClick: options.allowOutsideClick !== undefined ? options.allowOutsideClick : true,
+            
+            // --- PREPARAÇÃO PARA O FUTURO (ESTILOS E DARK MODE) ---
+            // 'buttonsStyling: true' mantém o padrão agora. 
+            // Para seus estilos no futuro, você mudará para 'false' via variável se necessário.
+            buttonsStyling: options.buttonsStyling !== undefined ? options.buttonsStyling : true,
+            
+            // Adicionamos classes que você poderá estilizar no seu CSS depois
+            customClass: {
+                container: 'rls-modal-container', // Útil para Dark Mode global
+                popup: 'rls-modal-popup',         // Gancho para bordas/fundo
+                header: 'rls-modal-header',
+                title: 'rls-modal-title',
+                closeButton: 'rls-modal-close',
+                icon: 'rls-modal-icon',
+                image: 'rls-modal-image',
+                htmlContainer: 'rls-modal-content',
+                input: 'rls-modal-input',
+                inputLabel: 'rls-modal-input-label',
+                validationMessage: 'rls-modal-validation',
+                actions: 'rls-modal-actions',
+                confirmButton: 'rls-modal-btn-confirm', // Gancho para botões do Zeina
+                cancelButton: 'rls-modal-btn-cancel',
+                denyButton: 'rls-modal-btn-deny',
+                loader: 'rls-modal-loader',
+                footer: 'rls-modal-footer',
+                timerProgressBar: 'rls-modal-progress'
+            }
+        });
+    },
+
+    // --- ATALHOS RÁPIDOS ---
+    confirm: function(title, text, confirmBtnText) {
+        return this.fire({
+            title: title || '{{ lang("WARNING")|escape("js") }}',
+            text: text,
+            icon: 'warning',
+            showCancel: true,
+            confirmText: confirmBtnText || '{{ lang("YES")|escape("js") }}'
+        });
+    },
+
+    success: function(title, text) {
+        return this.fire({
+            title: title || '{{ lang("SUCCESS")|escape("js") }}',
+            text: text,
+            icon: 'success',
+            confirmColor: this.colors.success
+        });
+    },
+
+    error: function(title, text) {
+        return this.fire({
+            title: title || '{{ lang("ERROR")|escape("js") }}',
+            text: text,
+            icon: 'error',
+            confirmColor: this.colors.danger
+        });
+    },
+
+    loading: function(title) {
+        Swal.fire({
+            title: title || '{{ lang("LOADING")|escape("js") }}',
+            allowOutsideClick: false,
+            didOpen: () => { Swal.showLoading(); },
+            customClass: { popup: 'rls-modal-popup rls-loading' }
+        });
+    }
+};
+</script>

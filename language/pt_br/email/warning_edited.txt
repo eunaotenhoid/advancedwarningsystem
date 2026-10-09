@@ -1,0 +1,20 @@
+Subject: {SITENAME} - Sua advertência foi editada
+
+Olá {USERNAME},
+
+Uma advertência aplicada a você em "{SITENAME}" foi editada por {WARNING_POSTER}.
+
+----------------------------------------------------------------------
+Regra (Anterior): {WARNING_OLD}
+Duração (Anterior): {WARNING_LENGTH_OLD}
+----------------------------------------------------------------------
+Regra (Nova): {RULE_TYPE}
+Detalhes: {RULE_DESCRIPTION}
+
+Justificativa Atualizada: {RULE}
+Duração Atualizada: {WARNING_LENGTH}
+----------------------------------------------------------------------
+
+Se você tiver dúvidas sobre esta alteração, entre em contato com {WARNING_POSTER}.
+
+{EMAIL_SIG}

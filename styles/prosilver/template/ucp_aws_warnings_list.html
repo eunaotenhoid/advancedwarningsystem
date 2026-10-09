@@ -1,0 +1,196 @@
+{% include 'ucp_header.html' %}
+
+<h2 class="ucp-title">{{ lang('WARNING_LIST') }}</h2>
+
+{% if S_CLEAN_RECORD %}
+<div class="rules"
+    style="background-color: #e8f5e9; border-color: #81c784; color: #2e7d32; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+    <p style="margin: 0; font-size: 1.1em;"><i class="icon fa-check-circle fa-fw" aria-hidden="true"></i> {{ lang('CLEAN_RECORD_MESSAGE') }}</p>
+</div>
+{% endif %}
+
+{% if S_HAS_WARNINGS %}
+<div class="rules"
+    style="background-color: #fffde7; border-color: #fbc02d; color: #f57f17; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+    <p style="margin: 0; font-size: 1.1em;"><i class="icon fa-exclamation-circle fa-fw" aria-hidden="true"></i> {{ lang('ACTIVE_WARNINGS_MESSAGE') }}</p>
+</div>
+{% endif %}
+
+{% if S_NEAR_BAN %}
+<div class="rules"
+    style="background-color: #ffebee; border-color: #ef5350; color: #c62828; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+    <p style="margin: 0; font-size: 1.1em;"><strong><i class="icon fa-exclamation-triangle fa-fw" aria-hidden="true"></i> {{ lang('NEAR_BAN_MESSAGE') }}</strong></p>
+</div>
+{% endif %}
+
+<style>
+    .user-profile-header {
+        display: flex;
+        gap: 25px;
+        align-items: center;
+
+        min-height: {
+                {
+                AVATAR_MAX_HEIGHT+40
+            }
+        }
+
+        px;
+        margin-bottom: 25px;
+        background: #f9f9f9;
+        padding: 20px;
+        border-radius: 10px;
+        border: 1px solid #eeeeee;
+        overflow: hidden;
+    }
+
+    .user-avatar-column {
+        flex: 0 0 {
+                {
+                AVATAR_MAX_WIDTH+10
+            }
+        }
+
+        px;
+        text-align: center;
+    }
+
+    .user-avatar img {
+        max-width: {
+                {
+                AVATAR_MAX_WIDTH
+            }
+        }
+
+        px !important;
+
+        max-height: {
+                {
+                AVATAR_MAX_HEIGHT
+            }
+        }
+
+        px !important;
+        height: auto !important;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .user-info-column {
+        flex: 1;
+    }
+</style>
+
+<div class="panel">
+    <div class="inner">
+        <div class="user-profile-header">
+            <div class="user-avatar-column">
+                {% if AVATAR_IMG %}<div class="user-avatar">{{ AVATAR_IMG }}</div>{% endif %}
+            </div>
+
+            <div class="user-info-column" style="flex-grow: 1;">
+                <h3 style="margin-top: 0;">{{ USERNAME_FULL }}</h3>
+                <dl class="details" style="margin-bottom: 0;">
+                    {% if RANK_TITLE or RANK_IMG %}
+                    <dt>{{ lang('RANK') }}{{ lang('COLON') }}</dt>
+                    <dd>
+                        {% if RANK_TITLE %}{{ RANK_TITLE }}{% endif %}
+                        {% if RANK_IMG %}<div>{{ RANK_IMG }}</div>{% endif %}
+                    </dd>
+                    {% endif %}
+                    <dt>{{ lang('JOINED') }}{{ lang('COLON') }}</dt>
+                    <dd>{{ JOINED }}</dd>
+                    <dt>{{ lang('TOTAL_POSTS') }}{{ lang('COLON') }}</dt>
+                    <dd>{{ POSTS }}</dd>
+                    <dt>{{ lang('WARNINGS') }}{{ lang('COLON') }}</dt>
+                    <dd><strong>{{ INFRACTION_POINTS }}</strong></dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+{% include 'aws_warnings_list_block.html' %}
+
+{% include '@eunaumtenhoid_advancedwarningsystem/sweetalert_modal_core.html' %}
+
+<script>
+// Função Global estilo a que você usa em outras extensões
+function openAppealModal(url) {
+    if (typeof Swal === 'undefined' && typeof RLSModal !== 'undefined') {
+        // Fallback para o nosso wrapper se o Swal global não estiver disponível
+        var SwalVar = RLSModal;
+    } else {
+        var SwalVar = Swal;
+    }
+
+    if (typeof SwalVar === 'undefined') {
+        console.error('SweetAlert2 not loaded.');
+        window.location.href = url; // Fallback para a página padrão se tudo falhar
+        return;
+    }
+
+    SwalVar.fire({
+        title: '{{ lang("REQUEST_APPEAL")|escape("js") }}',
+        input: 'textarea',
+        inputPlaceholder: '{{ lang("APPEAL_REASON_EMPTY")|escape("js") }}',
+        inputAttributes: { 'style': 'height: 150px; font-family: inherit;' },
+        showCancelButton: true,
+        confirmButtonText: '{{ lang("SUBMIT")|escape("js") }}',
+        cancelButtonText: '{{ lang("CANCEL")|escape("js") }}',
+        confirmButtonColor: '#27ae60',
+        inputValidator: (value) => {
+            if (!value) {
+                return '{{ lang("APPEAL_REASON_EMPTY")|escape("js") }}';
+            }
+        }
+    }).then((res) => {
+        if (res.isConfirmed && res.value) {
+            // Mostrar carregamento
+            if (typeof RLSModal !== 'undefined' && RLSModal.loading) {
+                RLSModal.loading('{{ lang("LOADING")|escape("js") }}');
+            }
+
+            jQuery.ajax({
+                url: url,
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    'appeal_reason': res.value,
+                    'form_token': '{{ S_FORM_TOKEN }}',
+                    'creation_time': '{{ S_FORM_TIME }}',
+                    'confirm': 1
+                },
+                success: function(response) {
+                    if (response.success) {
+                        SwalVar.fire({
+                            icon: 'success',
+                            title: '{{ lang("SUCCESS")|escape("js") }}',
+                            text: response.message
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    } else {
+                        SwalVar.fire({
+                            icon: 'error',
+                            title: '{{ lang("ERROR")|escape("js") }}',
+                            text: response.message
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    SwalVar.fire({
+                        icon: 'error',
+                        title: '{{ lang("ERROR")|escape("js") }}',
+                        text: 'AJAX Error: ' + error
+                    });
+                }
+            });
+        }
+    });
+}
+</script>
+
+{% include 'ucp_footer.html' %}

@@ -1,0 +1,20 @@
+Subject: {SITENAME} - Your warning has been edited
+
+Hello {USERNAME},
+
+A warning issued to you on "{SITENAME}" has been edited by {WARNING_POSTER}.
+
+----------------------------------------------------------------------
+Rule (Old): {WARNING_OLD}
+Duration (Old): {WARNING_LENGTH_OLD}
+----------------------------------------------------------------------
+Rule (New): {RULE_TYPE}
+Details: {RULE_DESCRIPTION}
+
+Updated Justification: {RULE}
+Updated Duration: {WARNING_LENGTH}
+----------------------------------------------------------------------
+
+If you have any questions about this change, please contact {WARNING_POSTER}.
+
+{EMAIL_SIG}

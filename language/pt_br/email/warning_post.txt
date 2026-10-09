@@ -1,0 +1,20 @@
+Subject: {SITENAME} - Você recebeu uma advertência por uma postagem
+
+Olá {USERNAME},
+
+Você recebeu uma advertência em "{SITENAME}" pela seguinte postagem: {POST_URL}
+A advertência foi aplicada por {WARNING_POSTER}.
+
+----------------------------------------------------------------------
+Regra Infringida: {RULE_TYPE}
+Detalhes: {RULE_DESCRIPTION}
+
+Justificativa Adicional: {RULE}
+Duração da Advertência: {WARNING_LENGTH}
+----------------------------------------------------------------------
+
+Se o seu número total de advertências ativas atingir {WARNINGS_COUNT}, sua conta será banida automaticamente.
+
+Se você tiver dúvidas sobre esta advertência, entre em contato com {WARNING_POSTER}.
+
+{EMAIL_SIG}

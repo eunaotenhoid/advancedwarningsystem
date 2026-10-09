@@ -1,0 +1,19 @@
+Subject: {SITENAME} - You have been warned
+
+Hello {USERNAME},
+
+You have received a warning on "{SITENAME}" issued by {WARNING_POSTER}.
+
+----------------------------------------------------------------------
+Infringed Rule: {RULE_TYPE}
+Details: {RULE_DESCRIPTION}
+
+Additional Justification: {RULE}
+Warning Duration: {WARNING_LENGTH}
+----------------------------------------------------------------------
+
+If the total number of active warnings reaches {WARNINGS_COUNT}, your account will be banned automatically.
+
+If you have any questions about this warning, please contact {WARNING_POSTER}.
+
+{EMAIL_SIG}

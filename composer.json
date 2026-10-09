@@ -1,0 +1,33 @@
+{
+    "name": "eunaumtenhoid/advancedwarningsystem",
+    "type": "phpbb-extension",
+    "description": "This extension replaces the built-in warnings system with a more advanced one including icons, color levels, and custom rules.",
+    "version": "1.0.0",
+    "license": "GPL-2.0-only",
+    "authors": [
+        {
+            "name": "rxu",
+            "role": "Original Developer"
+        },
+        {
+            "name": "eunaumtenhoid",
+            "role": "Developer",
+            "email": "eunaumtenhoid@outlook.com",
+            "homepage": "https://github.com/eunaotenhoid"
+        }
+    ],
+    "require": {
+        "php": ">=7.1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "eunaumtenhoid\\advancedwarningsystem\\": "./"
+        }
+    },
+    "extra": {
+        "display-name": "Advanced Warning System",
+        "soft-require": {
+            "phpbb/phpbb": ">=3.2.0"
+        }
+    }
+}

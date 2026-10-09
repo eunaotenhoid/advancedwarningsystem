@@ -1,0 +1,2 @@
+parameters:
+    eunaumtenhoid.advancedwarningsystem.tables.warning_rules: '%core.table_prefix%aws_warning_rules'

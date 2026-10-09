@@ -1,0 +1,147 @@
+<!-- INCLUDE mcp_header.html -->
+<!-- INCLUDE sweetalert_modal_core.html -->
+
+<form id="mcp_aws_appeals" method="post" action="{U_POST_ACTION}">
+
+<h2>{L_MCP_WARN_APPEALS}</h2>
+
+<div class="action-bar bar-top">
+	<div class="pagination">
+		{TOTAL_APPEALS}
+		<!-- IF .pagination -->
+			<!-- INCLUDE pagination.html -->
+		<!-- ELSE -->
+			 &bull; {PAGE_NUMBER}
+		<!-- ENDIF -->
+	</div>
+</div>
+
+<div class="panel">
+	<div class="inner">
+
+	<!-- IF .appeals -->
+		<table class="table1">
+		<thead>
+		<tr>
+			<th class="name">{L_USERNAME}</th>
+			<th class="name">{L_WARNING_TYPE}</th>
+			<th class="name" style="width: 20%;">{L_WARNING_TIME}</th>
+			<th class="name" style="width: 20%;">{L_APPEAL_TIME}</th>
+			<th>{L_ACTION}</th>
+		</tr>
+		</thead>
+		<tbody>
+		<!-- BEGIN appeals -->
+			<tr class="<!-- IF appeals.S_ROW_COUNT is odd -->bg1<!-- ELSE -->bg2<!-- ENDIF -->">
+				<td>{appeals.USERNAME_FULL}</td>
+				<td>{appeals.WARNING_TYPE}</td>
+				<td class="center">{appeals.WARNING_TIME}</td>
+				<td class="center">{appeals.APPEAL_TIME}</td>
+				<td class="center" style="white-space: nowrap;">
+					<button type="submit" name="approve" value="{appeals.WARNING_ID}" class="button1" style="background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%); color: white; padding: 5px 15px; border-radius: 50px !important; font-size: 0.85em; font-weight: bold; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 2px 4px rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+						<i class="icon fa-check fa-fw" aria-hidden="true"></i> {L_APPROVE}
+					</button> &nbsp;
+					<button type="submit" name="deny" value="{appeals.WARNING_ID}" class="button1" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; padding: 5px 15px; border-radius: 50px !important; font-size: 0.85em; font-weight: bold; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 2px 4px rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+						<i class="icon fa-times fa-fw" aria-hidden="true"></i> {L_DENY}
+					</button>
+				</td>
+			</tr>
+			<tr class="<!-- IF appeals.S_ROW_COUNT is odd -->bg1<!-- ELSE -->bg2<!-- ENDIF -->">
+				<td colspan="5" style="padding-bottom: 25px;">
+					<strong>{L_APPEAL_REASON}{L_COLON}</strong><br />
+					<div style="margin-top: 5px; padding: 10px; border: 1px solid #ddd; background: #fdfdfd; border-radius: 4px;">{appeals.APPEAL_REASON}</div>
+				</td>
+			</tr>
+		<!-- END appeals -->
+		</tbody>
+		</table>
+	<!-- ELSE -->
+		<p><strong>{L_NO_ENTRIES}</strong></p>
+	<!-- ENDIF -->
+
+</div>
+
+<div class="action-bar bar-bottom">
+	<div class="pagination">
+		{TOTAL_APPEALS}
+		<!-- IF .pagination -->
+			<!-- INCLUDE pagination.html -->
+		<!-- ELSE -->
+			 &bull; {PAGE_NUMBER}
+		<!-- ENDIF -->
+	</div>
+</div>
+
+{S_FORM_TOKEN}
+</form>
+
+<!-- INCLUDE mcp_footer.html -->
+
+<script>
+(function($) {
+    'use strict';
+
+    $(function() {
+        $('#mcp_aws_appeals button[name="approve"], #mcp_aws_appeals button[name="deny"]').on('click', function(e) {
+            e.preventDefault();
+            
+            var $button = $(this);
+            var action = $button.attr('name');
+            var warnId = $button.val();
+            var $form = $('#mcp_aws_appeals');
+            var url = $form.attr('action');
+            
+            // Texto para o modal
+            var confirmTitle = action === 'approve' ? '{LA_APPROVE}' : '{LA_DENY}';
+            var confirmText = action === 'approve' ? '{LA_CONFIRM_APPROVE_APPEAL}' : '{LA_CONFIRM_DENY_APPEAL}';
+            
+            // Fallback se as linguagens não existirem
+            if (confirmText.indexOf('LA_') === 0) {
+                confirmText = action === 'approve' ? 'Deseja realmente aprovar esta apelação?' : 'Deseja realmente negar esta apelação?';
+            }
+
+            RLSModal.confirm(confirmTitle, confirmText).then((result) => {
+                if (result.isConfirmed) {
+                    RLSModal.loading('{LA_LOADING}');
+                    
+                    var postData = $form.serializeArray();
+                    // Adiciona o botão clicado ao POST
+                    postData.push({ name: action, value: warnId });
+                    
+                    $.ajax({
+                        url: url.replace(/&amp;/g, '&'),
+                        type: 'POST',
+                        data: $.param(postData),
+                        dataType: 'json',
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    })
+                    .done(function(response) {
+                        if (response.success) {
+                            RLSModal.success('{LA_SUCCESS}', response.message);
+                            
+                            // Remove as linhas da tabela
+                            var $row = $button.closest('tr');
+                            var $nextRow = $row.next('tr');
+                            
+                            $row.fadeOut(400, function() { $(this).remove(); });
+                            $nextRow.fadeOut(400, function() { $(this).remove(); });
+                            
+                            // Verifica se ainda existem apelações
+                            setTimeout(function() {
+                                if ($('#mcp_aws_appeals tbody tr').length === 0) {
+                                    location.reload(); // Recarrega para mostrar "Sem apelações"
+                                }
+                            }, 500);
+                        } else {
+                            RLSModal.error('{LA_ERROR}', response.message || '{LA_FORM_INVALID}');
+                        }
+                    })
+                    .fail(function(jqXHR, textStatus, errorThrown) {
+                        RLSModal.error('{LA_ERROR}', '{LA_AJAX_ERROR}');
+                    });
+                }
+            });
+        });
+    });
+})(jQuery);
+</script>

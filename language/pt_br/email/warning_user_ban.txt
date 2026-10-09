@@ -1,0 +1,19 @@
+Subject: {SITENAME} - Sua conta foi banida
+
+Olá {USERNAME},
+
+Sua conta em "{SITENAME}" foi banida por {WARNING_POSTER}.
+
+----------------------------------------------------------------------
+Regra Infringida: {RULE_TYPE}
+Detalhes: {RULE_DESCRIPTION}
+
+Justificativa: {RULE}
+Duração do Banimento: {WARNING_LENGTH}
+----------------------------------------------------------------------
+
+Este é um banimento imediato aplicado por um moderador.
+
+Se você tiver dúvidas sobre este banimento, entre em contato com {WARNING_POSTER}.
+
+{EMAIL_SIG}

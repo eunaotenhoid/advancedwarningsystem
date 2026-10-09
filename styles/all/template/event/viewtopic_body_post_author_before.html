@@ -1,0 +1,10 @@
+{% if postrow.AWS_ICONS %}
+	<span class="profile-cards" style="display: inline-block; vertical-align: middle; margin-right: 5px;">
+		{% for icon in postrow.AWS_ICONS %}
+			<i class="fa {{ icon.ICON }}" style="color: {{ icon.COLOR }}; vertical-align: middle; margin-right: 2px;" title="{{ lang('WARNING') }}"></i>
+		{% endfor %}
+	</span>
+{% endif %}
+
+
+

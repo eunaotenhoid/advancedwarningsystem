@@ -1,0 +1,71 @@
+<div class="panel">
+    <div class="inner">
+        <h3>{{ lang('WARNINGS') }}</h3>
+
+        {% if USER_INFRACTIONS %}
+            <table class="table1">
+                <thead>
+                    <tr>
+                        <th class="name">{{ lang('WARNING_TYPE') }}</th>
+                        <th class="name">{{ lang('MODERATOR') }}</th>
+                        <th class="center" style="width: 10%;">{{ lang('RULE_POINTS') }}</th>
+                        <th class="center" style="width: 15%;">{{ lang('STATUS') }}</th>
+                        <th class="name" style="width: 15%;">{{ lang('WARNING_TIME') }}</th>
+                        <th class="name" style="width: 15%;">{{ lang('WARNING_EXPIRES') }}</th>
+                        {% if S_APPEAL_ENABLED %}<th class="center" style="width: 15%;">{{ lang('APPEAL') }}</th>{% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                {% for warning in USER_INFRACTIONS %}
+                    <tr class="{{ cycle(['bg1', 'bg2'], loop.index0) }}">
+                        <td>
+                            {{ warning.TYPE }}
+                            {% if warning.U_POST %}
+                                <a href="{{ warning.U_POST }}" title="{{ lang('WARNING_POST') }}">
+                                    <i class="icon fa-external-link-square fa-fw" aria-hidden="true"></i>
+                                </a>
+                            {% endif %}
+                        </td>
+                        <td>{{ warning.MODERATOR_FULL }}</td>
+                        <td class="center">{{ warning.POINTS }}</td>
+                        <td class="center">
+                            {% if warning.STATUS %}
+                                <strong style="color: #d32f2f;">{{ lang('ACTIVE') }}</strong>
+                            {% else %}
+                                <span style="color: #757575;">{{ lang('WARNING_EXPIRED') }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ warning.TIME }}</td>
+                        <td>{{ warning.EXPIRES }}</td>
+                        {% if S_APPEAL_ENABLED %}
+                        <td class="center">
+                            {% if warning.APPEAL_STATUS == 1 %}
+                                <span style="background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%); color: white; padding: 4px 12px; border-radius: 50px !important; font-size: 0.85em; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: inline-block; white-space: nowrap; border: 1px solid rgba(255,255,255,0.2);">
+                                    <i class="icon fa-clock-o fa-fw" aria-hidden="true"></i> {{ lang('APPEAL_PENDING') }}
+                                </span>
+                            {% elseif warning.APPEAL_STATUS == 2 %}
+                                <span style="background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%); color: white; padding: 4px 12px; border-radius: 50px !important; font-size: 0.85em; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: inline-block; white-space: nowrap; border: 1px solid rgba(255,255,255,0.2);">
+                                    <i class="icon fa-check fa-fw" aria-hidden="true"></i> {{ lang('APPEAL_APPROVED') }}
+                                </span>
+                            {% elseif warning.APPEAL_STATUS == 3 %}
+                                <span style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; padding: 4px 12px; border-radius: 50px !important; font-size: 0.85em; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: inline-block; white-space: nowrap; border: 1px solid rgba(255,255,255,0.2);">
+                                    <i class="icon fa-times fa-fw" aria-hidden="true"></i> {{ lang('APPEAL_DENIED') }}
+                                </span>
+                            {% elseif warning.S_CAN_APPEAL %}
+                                <button type="button" class="button1" style="background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); color: white; padding: 5px 15px; border-radius: 50px !important; font-size: 0.85em; font-weight: bold; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 2px 4px rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.2s;" onclick="openAppealModal('{{ U_APPEAL_ACTION }}&amp;warn_id={{ warning.ID }}')" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                                    <i class="icon fa-gavel fa-fw" aria-hidden="true"></i> {{ lang('REQUEST_APPEAL') }}
+                                </button>
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p><strong>{{ lang('NO_WARNINGS') }}</strong></p>
+        {% endif %}
+    </div>
+</div>

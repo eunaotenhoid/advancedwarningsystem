@@ -1,0 +1,195 @@
+{% include 'ucp_header.html' %}
+
+<h2 class="ucp-title">{{ lang('WARNING_LIST') }}</h2>
+
+{% if S_CLEAN_RECORD %}
+<div class="rules"
+    style="background-color: #e8f5e9; border-color: #81c784; color: #2e7d32; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+    <p style="margin: 0; font-size: 1.1em;"><i class="icon fa-check-circle fa-fw" aria-hidden="true"></i> {{ lang('CLEAN_RECORD_MESSAGE') }}</p>
+</div>
+{% endif %}
+
+{% if S_HAS_WARNINGS %}
+<div class="rules"
+    style="background-color: #fffde7; border-color: #fbc02d; color: #f57f17; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+    <p style="margin: 0; font-size: 1.1em;"><i class="icon fa-exclamation-circle fa-fw" aria-hidden="true"></i> {{ lang('ACTIVE_WARNINGS_MESSAGE') }}</p>
+</div>
+{% endif %}
+
+{% if S_NEAR_BAN %}
+<div class="rules"
+    style="background-color: #ffebee; border-color: #ef5350; color: #c62828; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+    <p style="margin: 0; font-size: 1.1em;"><strong><i class="icon fa-exclamation-triangle fa-fw" aria-hidden="true"></i> {{ lang('NEAR_BAN_MESSAGE') }}</strong></p>
+</div>
+{% endif %}
+
+<style>
+    .user-profile-header {
+        display: flex;
+        gap: 25px;
+        align-items: center;
+
+        min-height: {
+                {
+                AVATAR_MAX_HEIGHT+40
+            }
+        }
+
+        px;
+        margin-bottom: 25px;
+        background: #f9f9f9;
+        padding: 20px;
+        border-radius: 10px;
+        border: 1px solid #eeeeee;
+        overflow: hidden;
+    }
+
+    .user-avatar-column {
+        flex: 0 0 {
+                {
+                AVATAR_MAX_WIDTH+10
+            }
+        }
+
+        px;
+        text-align: center;
+    }
+
+    .user-avatar img {
+        max-width: {
+                {
+                AVATAR_MAX_WIDTH
+            }
+        }
+
+        px !important;
+
+        max-height: {
+                {
+                AVATAR_MAX_HEIGHT
+            }
+        }
+
+        px !important;
+        height: auto !important;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .user-info-column {
+        flex: 1;
+    }
+</style>
+
+<div class="panel">
+    <div class="inner">
+        <div class="user-profile-header">
+            <div class="user-avatar-column">
+                {% if AVATAR_IMG %}<div class="user-avatar">{{ AVATAR_IMG }}</div>{% endif %}
+            </div>
+
+            <div class="user-info-column" style="flex-grow: 1;">
+                <h3 style="margin-top: 0;">{{ USERNAME_FULL }}</h3>
+                <dl class="details" style="margin-bottom: 0;">
+                    {% if RANK_TITLE or RANK_IMG %}
+                    <dt>{{ lang('RANK') }}{{ lang('COLON') }}</dt>
+                    <dd>
+                        {% if RANK_TITLE %}{{ RANK_TITLE }}{% endif %}
+                        {% if RANK_IMG %}<div>{{ RANK_IMG }}</div>{% endif %}
+                    </dd>
+                    {% endif %}
+                    <dt>{{ lang('JOINED') }}{{ lang('COLON') }}</dt>
+                    <dd>{{ JOINED }}</dd>
+                    <dt>{{ lang('TOTAL_POSTS') }}{{ lang('COLON') }}</dt>
+                    <dd>{{ POSTS }}</dd>
+                    <dt>{{ lang('WARNINGS') }}{{ lang('COLON') }}</dt>
+                    <dd><strong>{{ INFRACTION_POINTS }}</strong></dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+{% include 'aws_warnings_list_block.html' %}
+
+{% include '@eunaumtenhoid_advancedwarningsystem/sweetalert_modal_core.html' %}
+
+<script>
+    (function ($) {
+        'use strict';
+
+        $(function () {
+            // Debug selector to verify jQuery sees our buttons
+            console.log('AWS: Found ' + $('.aws-appeal-link').length + ' appeal buttons');
+
+            $('.aws-appeal-link').on('click', function (e) {
+                // STEP 1: VERIFICATION ALERT
+                alert('Link clicado! O JavaScript está funcionando.');
+
+                console.log('AWS: Appeal link clicked');
+
+                // Check if RLSModal library was loaded correctly
+                if (typeof RLSModal === 'undefined') {
+                    console.error('AWS: RLSModal (SweetAlert2 wrapper) not loaded. Falling back to standard form.');
+                    return; // Let the browser follow the standard link
+                }
+
+                e.preventDefault();
+                var $this = $(this);
+                var url = $this.attr('href');
+                console.log('AWS: Targeted URL: ' + url);
+
+                RLSModal.fire({
+                    title: '{{ lang("REQUEST_APPEAL")|escape("js") }}',
+                    input: 'textarea',
+                    inputPlaceholder: '{{ lang("APPEAL_REASON_EMPTY")|escape("js") }}',
+                    showCancel: true,
+                    confirmText: '{{ lang("SUBMIT")|escape("js") }}',
+                    cancelText: '{{ lang("CANCEL")|escape("js") }}',
+                    inputValidator: (value) => {
+                        if (!value) {
+                            return '{{ lang("APPEAL_REASON_EMPTY")|escape("js") }}';
+                        }
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        console.log('AWS: User confirmed SweetAlert with reason: ' + result.value);
+                        RLSModal.loading('{{ lang("LOADING")|escape("js") }}');
+
+                        $.ajax({
+                            url: url,
+                            type: 'POST',
+                            dataType: 'json',
+                            data: {
+                                'appeal_reason': result.value,
+                                'form_token': '{{ S_FORM_TOKEN }}',
+                                'creation_time': '{{ S_FORM_TIME }}',
+                                'confirm': 1
+                            },
+                            success: function (response) {
+                                console.log('AWS: AJAX Success received', response);
+                                if (response.success) {
+                                    RLSModal.success('{{ lang("SUCCESS")|escape("js") }}', response.message).then(() => {
+                                        window.location.reload();
+                                    });
+                                } else {
+                                    RLSModal.error('{{ lang("ERROR")|escape("js") }}', response.message);
+                                }
+                            },
+                            error: function (xhr, status, error) {
+                                console.error('AWS: AJAX Error detected', { status: status, error: error, message: xhr.responseText });
+                                RLSModal.error('{{ lang("ERROR")|escape("js") }}', 'AJAX Error: ' + error);
+                            }
+                        });
+                    } else {
+                        console.log('AWS: User cancelled SweetAlert');
+                    }
+                });
+            });
+        });
+    })(jQuery);
+</script>
+
+{% include 'ucp_footer.html' %}
